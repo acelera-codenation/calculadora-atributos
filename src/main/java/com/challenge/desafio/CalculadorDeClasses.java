@@ -10,23 +10,21 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class CalculadorDeClasses implements Calculavel {
-cl
-    public BigDecimal getValor(Object object, Field field) {
+
+    private BigDecimal getValor(Object object, Field field) {
+        if (field.getType() != BigDecimal.class)
+            return BigDecimal.ZERO;
+
         try {
-            if (field.getType() != BigDecimal.class)
-                return BigDecimal.ZERO;
-            else {
-                field.setAccessible(true);
-                return (BigDecimal) field.get(object);
-            }
+            field.setAccessible(true);
+            return (BigDecimal) field.get(object);
         } catch (IllegalAccessException e) {
             return BigDecimal.ZERO;
         }
     }
 
     public BigDecimal processarCalculoPorTipoAtributo(Object object, Class<? extends Annotation> tipoAtributo) {
-        Class<?> classe = object.getClass();
-        return Arrays.stream(classe.getDeclaredFields())
+        return Arrays.stream(object.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(tipoAtributo))
                 .map(field -> getValor(object, field))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
